@@ -16,15 +16,17 @@ static bool ms_mhHooksAttached = false;
 #define DEFINE_HOOK(address, detour, original) \
 	MH_CreateHook((LPVOID)(v_mod_base + address), (LPVOID)detour, (LPVOID*)&original)
 
-static std::uint32_t (*o_getLogicControllerConnectionColor)(ControllerBase*) = nullptr;
-std::uint32_t h_getLogicControllerConnectionColor(ControllerBase* self)
+static std::uint32_t (*o_getLogicControllerConnectionColor)(SM::ControllerBase*) = nullptr;
+std::uint32_t h_getLogicControllerConnectionColor(SM::ControllerBase* self)
 {
-	return self->parent_shape->getColor().data;
+	return self->m_pParentShape->getColor().data;
 }
 
-#if _SM_VERSION_NUM == 073776
+#if _SM_VERSION_NUM == 0x074778
+# define CC_GET_LOGIC_CONNECTION_COLOR_ADDR 0x974A40
+#elif _SM_VERSION_NUM == 0x073776
 # define CC_GET_LOGIC_CONNECTION_COLOR_ADDR 0x974780
-#elif _SM_VERSION_NUM == 072775
+#elif _SM_VERSION_NUM == 0x072775
 # define CC_GET_LOGIC_CONNECTION_COLOR_ADDR 0x974B10
 #else
 # define CC_GET_LOGIC_CONNECTION_COLOR_ADDR 0x963890
@@ -32,11 +34,11 @@ std::uint32_t h_getLogicControllerConnectionColor(ControllerBase* self)
 
 void process_attach()
 {
-	if (!SmSdk::CheckTimestamp(_SM_TIMESTAMP_073_776))
+	if (!SmSdk::CheckTimestamp(_SM_TIMESTAMP_074_778))
 	{
 		MessageBoxA(
 			NULL,
-			"Your game version is not supported by Colorable Connections. The current version of the mod has been built for Scrap Mechanic 0.7.2.775\n\nPress OK to continue loading without the mod.",
+			"Your game version is not supported by Colorable Connections. The current version of the mod has been built for Scrap Mechanic 0.7.4.778\n\nPress OK to continue loading without the mod.",
 			"Unsupported Version",
 			MB_ICONWARNING);
 		return;
